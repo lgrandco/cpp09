@@ -3,6 +3,7 @@
 
 #include "colors.hpp"
 #include <cstring>
+#include <list>
 #include <stack>
 
 void rpn(char* s);

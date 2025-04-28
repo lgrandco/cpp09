@@ -1,6 +1,6 @@
 #include "RPN.hpp"
 
-void doOp(std::stack<long >& stack, char op) {
+void doOp(std::stack<long, std::list<long> >& stack, char op) {
 
     long second = stack.top();
     stack.pop();
@@ -16,7 +16,7 @@ void doOp(std::stack<long >& stack, char op) {
 }
 
 void rpn(char* s) {
-    std::stack<long> stack;
+    std::stack<long, std::list<long> > stack;
     size_t nums = 0;
     for (size_t i = 0; s[i]; i++) {
         if (i % 2 && s[i] != ' ') throw std::runtime_error("Bad input format");
