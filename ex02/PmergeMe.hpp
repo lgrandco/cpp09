@@ -130,7 +130,7 @@ size_t get_pos(const Cont& seq, size_t right, size_t pair_size, int value) {
         ++g_comps;
         middle = left + (right - left) / 2;
         int middle_value = seq[middle * pair_size + pair_size - 1];
-        if (middle_value == value) return middle;
+        if (middle_value == value) return middle * pair_size;
         if (middle_value < value) left = middle + 1;
         else right = middle;
     }
