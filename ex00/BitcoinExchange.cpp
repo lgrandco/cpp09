@@ -18,7 +18,8 @@ std::ostream& operator<<(std::ostream& os, const Date& date) {
 
 static bool verif_day(Date date) {
     if (date.month == 2) {
-        if (date.year % 4 == 0 && (date.year % 100 != 0 || date.year % 400)) return date.day <= 29;
+        if (date.year % 4 == 0 && (date.year % 100 != 0 || date.year % 400 == 0))
+            return date.day <= 29;
         else return date.day <= 28;
     }
     if (date.month == 4 || date.month == 6 || date.month == 9 || date.month == 11)
