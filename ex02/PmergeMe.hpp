@@ -84,22 +84,6 @@ void get_numbers(char** av, Wrapper& w) {
     }
 }
 
-template <typename Wrapper>
-void make_pairs(Wrapper& w) {
-    long prev = -1;
-    for (size_t i = 0; i < w.seq.size(); ++i) {
-        int n = w.seq[i];
-        if (prev == -1) prev = n;
-        else {
-            if (prev < n) w.pairs.push_back(std::make_pair(prev, n));
-            else w.pairs.push_back(std::make_pair(n, prev));
-            prev = -1;
-        }
-    }
-    w.alone = prev;
-    g_comps += w.pairs.size();
-}
-
 int comp(int a, int b);
 
 template <typename Container>
