@@ -2,7 +2,7 @@
 
 size_t g_comps = 0;
 
-int comp(int a, int b) {
+bool comp(int a, int b) {
     ++g_comps;
     return a < b;
 }

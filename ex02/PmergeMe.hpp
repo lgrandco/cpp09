@@ -84,7 +84,7 @@ void get_numbers(char** av, Wrapper& w) {
     }
 }
 
-int comp(int a, int b);
+bool comp(int a, int b);
 
 template <typename Container>
 void push_biggest(Container& dst, const Container& src, size_t pair_size) {
@@ -123,7 +123,7 @@ void swap_pairs(Iterator a, Iterator b, size_t pair_size) {
 }
 
 template <typename Cont>
-size_t get_pos(Cont seq, size_t right, size_t pair_size, int value) {
+size_t get_pos(const Cont& seq, size_t right, size_t pair_size, int value) {
     size_t left = 0;
     size_t middle;
     while (left < right) {
