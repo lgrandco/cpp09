@@ -10,10 +10,7 @@ int main(int ac, char** av) {
         Container<std::vector> vector;
         Container<std::deque> deque;
 
-        // print_color("FINAL");
-        // for (size_t i = 0; i < vector.seq.size(); i++) std::cout << vector.seq[i] << " ";
-        // print_color("----------");
         test_container(av, vector, "std::vector");
-        // test_container(av, deque, "std::deque");
+        test_container(av, deque, "std::deque");
     } catch (std::exception& e) { print_color(e.what(), std ::cerr); }
 }

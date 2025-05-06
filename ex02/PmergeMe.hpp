@@ -103,12 +103,12 @@ void make_pairs(Wrapper& w) {
 int comp(int a, int b);
 
 template <typename Container>
-void push_biggest(Container& dst, const Container& src, size_t level) {
+void push_biggest(Container& dst, const Container& src, size_t pair_size) {
     if (src.begin() == src.end()) { return; }
-    for (typename Container::const_iterator it = src.begin() + 3 * level;
-         it < src.begin() + (src.size() / level) * level;
-         it += 2 * level) {
-        for (size_t i = 0; i < level; ++i) { dst.push_back(*(it + i)); }
+    for (typename Container::const_iterator it = src.begin() + 3 * pair_size;
+         it < src.begin() + (src.size() / pair_size) * pair_size;
+         it += 2 * pair_size) {
+        for (size_t i = 0; i < pair_size; ++i) { dst.push_back(*(it + i)); }
     }
 }
 
@@ -128,8 +128,8 @@ void get_idxs(Indexes& idxs, size_t n) {
 }
 
 template <typename Iterator>
-void swap_pairs(Iterator a, Iterator b, size_t level) {
-    for (size_t i = 0; i < level; ++i) {
+void swap_pairs(Iterator a, Iterator b, size_t pair_size) {
+    for (size_t i = 0; i < pair_size; ++i) {
         int tmp = *a;
         *a = *b;
         *b = tmp;
@@ -139,91 +139,53 @@ void swap_pairs(Iterator a, Iterator b, size_t level) {
 }
 
 template <typename Cont>
-size_t get_pos(Cont seq, size_t right, size_t level, int value) {
+size_t get_pos(Cont seq, size_t right, size_t pair_size, int value) {
     size_t left = 0;
     size_t middle;
     while (left < right) {
-        // std::cout << "comp done" << std::endl;
         ++g_comps;
         middle = left + (right - left) / 2;
-        int middle_value = seq[middle * level + level - 1];
+        int middle_value = seq[middle * pair_size + pair_size - 1];
         if (middle_value == value) return middle;
         if (middle_value < value) left = middle + 1;
         else right = middle;
     }
-    return left * level;
+    return left * pair_size;
 }
 
 template <typename Wrapper>
-void merge_insert(Wrapper& cont, size_t level) {
-    if (cont.seq.size() / level < 2) return;
-    for (typename Wrapper::seq_type::iterator it = cont.seq.begin() + level;
-         it < cont.seq.begin() + (cont.seq.size() / level) * level;
-         it += 2 * level) {
-        typename Wrapper::seq_type::iterator last = it - level;
-        if (comp(*(it + level - 1), *(last + level - 1))) swap_pairs(last, it, level);
+void merge_insert(Wrapper& cont, size_t pair_size) {
+    if (cont.seq.size() / pair_size < 2) return;
+    for (typename Wrapper::seq_type::iterator it = cont.seq.begin() + pair_size;
+         it < cont.seq.begin() + (cont.seq.size() / pair_size) * pair_size;
+         it += 2 * pair_size) {
+        typename Wrapper::seq_type::iterator last = it - pair_size;
+        if (comp(*(it + pair_size - 1), *(last + pair_size - 1))) swap_pairs(last, it, pair_size);
     }
-    merge_insert(cont, level * 2);
+    merge_insert(cont, pair_size * 2);
     typename Wrapper::seq_type main_chain;
     // lvl * 2 for first 2 pairs
     for (typename Wrapper::seq_type::iterator it = cont.seq.begin();
-         it < cont.seq.begin() + level * 2;
+         it < cont.seq.begin() + pair_size * 2;
          ++it)
         main_chain.push_back(*it);
 
-    cont.is_alone = cont.seq.size() % (2 * level) >= level;
-    get_idxs(cont.idxs, cont.seq.size() / (2 * level) + cont.is_alone);
+    cont.is_alone = cont.seq.size() % (2 * pair_size) >= pair_size;
+    get_idxs(cont.idxs, cont.seq.size() / (2 * pair_size) + cont.is_alone);
 
-    push_biggest(main_chain, cont.seq, level);
-    // template <typename Container>
-    // void push_biggest(Container& dst, const Container& src, size_t level) {
-    //     if (src.begin() == src.end()) { return; }
-    //     for (typename Container::const_iterator it = src.begin() + 3 * level;
-    //          it < src.begin() + (src.size() / level) * level;
-    //          it += 2 * level) {
-    //         for (size_t i = 0; i < level; ++i) { dst.push_back(*(it + i)); }
-    //     }
-    // }
-    // std::cout << "level : " << level << "\n";
-    // std::cout << "sequence : ";
-    // for (size_t y = 0; y < cont.seq.size(); ++y) std::cout << cont.seq[y] << " ";
-    // std::cout << "\n";
-
-    // std::cout << "main_chain : ";
-    // for (size_t y = 0; y < main_chain.size(); ++y) std::cout << main_chain[y] << " ";
-    // std::cout << "\n";
-
-    // std::cout << "idxs : ";
-    // for (size_t y = 0; y < cont.idxs.size(); ++y) std::cout << cont.idxs[y] << " ";
-    // std::cout << "\n";
+    push_biggest(main_chain, cont.seq, pair_size);
     size_t inserted = 1;
     for (size_t i = 0; i < cont.idxs.size(); ++i) {
-        // std::cout << "main_chain before insert : ";
-        // for (size_t y = 0; y < main_chain.size(); ++y) std::cout << main_chain[y] << " ";
-        // std::cout << "\n";
-
-        // std::cout << "main_chain after push : ";
-        // for (size_t y = 0; y < main_chain.size(); ++y) std::cout << main_chain[y] << " ";
-        // std::cout << "\n";
-        (void)inserted;
-
-        typename Wrapper::seq_type::iterator it = cont.seq.begin() + cont.idxs[i] * 2 * level;
-        int value = *(it + level - 1);
-        size_t pos = get_pos(main_chain, cont.idxs[i] + inserted++, level, value);
-        main_chain.insert(main_chain.begin() + pos, it, it + level);
-        // std::cout << "main_chain after insert : ";
-        // for (size_t y = 0; y < main_chain.size(); ++y) std::cout << main_chain[y] << " ";
-        // std::cout << "\n";
+        typename Wrapper::seq_type::iterator it = cont.seq.begin() + cont.idxs[i] * 2 * pair_size;
+        int value = *(it + pair_size - 1);
+        size_t pos = get_pos(main_chain, cont.idxs[i] + inserted++, pair_size, value);
+        main_chain.insert(main_chain.begin() + pos, it, it + pair_size);
     }
     main_chain.insert(
         main_chain.end(),
-        cont.seq.begin() + cont.seq.size() / level * level,
+        cont.seq.begin() + cont.seq.size() / pair_size * pair_size,
         cont.seq.end()
     );
-    print_color("FINAL BEFORE RETURNING");
-    for (size_t y = 0; y < main_chain.size(); ++y) std::cout << main_chain[y] << " ";
-    print_color("end \n");
-    // cont.seq = main_chain;
     std::swap(main_chain, cont.seq);
 }
 
@@ -232,7 +194,25 @@ void test_container(char** av, Wrapper& cont, const std::string& name) {
     g_comps = 0;
     cont.begin_time = std::clock();
     get_numbers(av + 1, cont);
+    if (name == "std::vector") {
+        std::cout << get_color() << "Entered numbers:" << ANSI_RESET << std::endl;
+        for (typename Wrapper::seq_type::iterator it = cont.seq.begin(); it != cont.seq.end();
+             ++it) {
+            std::cout << get_color() << *it << " ";
+        }
+        std::cout << ANSI_RESET << std::endl;
+        print_sep();
+    }
     merge_insert(cont, 1);
+    if (name == "std::vector") {
+        std::cout << get_color() << "Sorted numbers:" << ANSI_RESET << std::endl;
+        for (typename Wrapper::seq_type::iterator it = cont.seq.begin(); it != cont.seq.end();
+             ++it) {
+            std::cout << get_color() << *it << " ";
+        }
+        std::cout << ANSI_RESET << std::endl;
+        print_sep();
+    }
     std::cout << get_color() << "Time: to process a range of " << cont.seq.size()
               << " elements with " << name << " : "
               << (std::clock() - cont.begin_time) / (double)CLOCKS_PER_SEC * 1000 << "ms in "
